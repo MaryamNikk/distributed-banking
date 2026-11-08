@@ -123,3 +123,14 @@ WARNING: docker compose down -v deletes persistent data.
 - Replica health checks occur on demand during routing.
 - Credentials are for local development.
 - Live re-sharding and autonomous self-healing bonuses are not implemented.
+
+## Published Docker image
+
+Docker Hub: https://hub.docker.com/r/maryamnik/distributed-banking
+
+The published image targets linux/arm64.
+For Intel/AMD hosts, build from source:
+
+```bash
+docker compose build gateway
+docker compose up -d --no-build --wait
