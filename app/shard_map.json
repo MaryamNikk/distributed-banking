@@ -1,0 +1,22 @@
+{
+  "shards": [
+    {
+      "id": "A",
+      "min": 1,
+      "max": 1000,
+      "replicas": [
+        "http://bank-a1:8000",
+        "http://bank-a2:8000"
+      ]
+    },
+    {
+      "id": "B",
+      "min": 1001,
+      "max": 2000,
+      "replicas": [
+        "http://bank-b1:8000",
+        "http://bank-b2:8000"
+      ]
+    }
+  ]
+}

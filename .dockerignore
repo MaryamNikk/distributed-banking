@@ -1,0 +1,13 @@
+.git
+.venv
+venv
+**/__pycache__
+**/*.py[cod]
+**/*.before-*
+**/.DS_Store
+**/*.log
+**/*.db
+**/*.db-shm
+**/*.db-wal
+**/*.db-journal
+.env

@@ -1,0 +1,40 @@
+name: distributed-banking
+
+services:
+  db-a:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: bank_a
+      POSTGRES_USER: bank
+      POSTGRES_PASSWORD: bank_dev_password
+    command: ["postgres", "-c", "max_prepared_transactions=100"]
+    volumes:
+      - db_a_data:/var/lib/postgresql/data
+      - ./db/shard_a.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bank -d bank_a"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
+
+  db-b:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: bank_b
+      POSTGRES_USER: bank
+      POSTGRES_PASSWORD: bank_dev_password
+    command: ["postgres", "-c", "max_prepared_transactions=100"]
+    volumes:
+      - db_b_data:/var/lib/postgresql/data
+      - ./db/shard_b.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bank -d bank_b"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
+
+volumes:
+  db_a_data:
+  db_b_data:

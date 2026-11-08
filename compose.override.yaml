@@ -1,0 +1,93 @@
+x-bank-common: &bank-common
+  build: .
+  image: distributed-banking-app:dev
+  healthcheck:
+    test:
+      - CMD
+      - python
+      - -c
+      - "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=2)"
+    interval: 5s
+    timeout: 3s
+    retries: 12
+    start_period: 10s
+
+services:
+  bank-a1:
+    <<: *bank-common
+    environment:
+      REPLICA_ID: A1
+      SHARD_ID: A
+      ACCOUNT_MIN: "1"
+      ACCOUNT_MAX: "1000"
+      DATABASE_URL: postgresql://bank:bank_dev_password@db-a:5432/bank_a
+    depends_on:
+      db-a:
+        condition: service_healthy
+
+  bank-a2:
+    <<: *bank-common
+    environment:
+      REPLICA_ID: A2
+      SHARD_ID: A
+      ACCOUNT_MIN: "1"
+      ACCOUNT_MAX: "1000"
+      DATABASE_URL: postgresql://bank:bank_dev_password@db-a:5432/bank_a
+    depends_on:
+      db-a:
+        condition: service_healthy
+
+  bank-b1:
+    <<: *bank-common
+    environment:
+      REPLICA_ID: B1
+      SHARD_ID: B
+      ACCOUNT_MIN: "1001"
+      ACCOUNT_MAX: "2000"
+      DATABASE_URL: postgresql://bank:bank_dev_password@db-b:5432/bank_b
+    depends_on:
+      db-b:
+        condition: service_healthy
+
+  bank-b2:
+    <<: *bank-common
+    environment:
+      REPLICA_ID: B2
+      SHARD_ID: B
+      ACCOUNT_MIN: "1001"
+      ACCOUNT_MAX: "2000"
+      DATABASE_URL: postgresql://bank:bank_dev_password@db-b:5432/bank_b
+    depends_on:
+      db-b:
+        condition: service_healthy
+
+  gateway:
+    build: .
+    image: distributed-banking-app:dev
+    command: ["python", "gateway.py"]
+    volumes:
+      - coordinator_data:/data
+    ports:
+      - "127.0.0.1:8080:8080"
+    depends_on:
+      bank-a1:
+        condition: service_healthy
+      bank-a2:
+        condition: service_healthy
+      bank-b1:
+        condition: service_healthy
+      bank-b2:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://localhost:8080/health', timeout=2)"
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 10s
+
+volumes:
+  coordinator_data:
