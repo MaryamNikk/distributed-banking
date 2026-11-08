@@ -1,6 +1,6 @@
 x-bank-common: &bank-common
   build: .
-  image: distributed-banking-app:dev
+  image: maryamnik/distributed-banking:1.0
   healthcheck:
     test:
       - CMD
@@ -63,7 +63,7 @@ services:
 
   gateway:
     build: .
-    image: distributed-banking-app:dev
+    image: maryamnik/distributed-banking:1.0
     command: ["python", "gateway.py"]
     volumes:
       - coordinator_data:/data
